@@ -1,3 +1,3 @@
 Tzispa Data
 
-Data access layer definition for Tzispa framework
+Data access layer for Tzispa framework
