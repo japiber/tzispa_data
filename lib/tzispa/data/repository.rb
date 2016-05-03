@@ -27,13 +27,13 @@ module Tzispa
       end
 
       def use(repo_id)
-        raise UnknownAdapter.new("The '#{adapter}' adapter does not exists") unless @adapters.has_key? repo_id
+        raise UnknownAdapter.new("The '#{repo_id}' adapter does not exists") unless @adapters.has_key? repo_id
         @selected_adapter = repo_id
       end
 
-      def [](model)
-        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{selected_adapter}'") unless @pool.has_key? self.class.key(model, selected_adapter)
-        @pool[self.class.key(model.to_sym, selected_adapter)]
+      def [](model, repo_id=nil)
+        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{repo_id || @selected_adapter}'") unless @pool.has_key? self.class.key(model, repo_id || @selected_adapter)
+        @pool[self.class.key(model.to_sym, repo_id || @selected_adapter)]
       end
 
       def load!
