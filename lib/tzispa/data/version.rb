@@ -3,7 +3,7 @@
 module Tzispa
   module Data
 
-    VERSION  = '0.1.2'
+    VERSION  = '0.1.3'
     NAME     = 'Tzispa Data'
     GEM_NAME = 'tzispa_data'
 

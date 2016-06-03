@@ -1,4 +1,8 @@
 Tzispa Data
+
+## v0.1.3
+- remove use method
+
 ## v0.1.2
 - Allow select repo id as second parameter in Repository [] method
 
