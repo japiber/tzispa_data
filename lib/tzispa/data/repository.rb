@@ -14,7 +14,7 @@ module Tzispa
 
     class Repository
 
-      attr_reader :root, :selected_adapter
+      attr_reader :root, :adapters
 
       LOCAL_REPO_ROOT = :repository
 
@@ -23,17 +23,12 @@ module Tzispa
         @root = root
         @pool = Hash.new
         @adapters = AdapterPool.new config
-        @selected_adapter = @adapters.default
-      end
-
-      def use(repo_id)
-        raise UnknownAdapter.new("The '#{repo_id}' adapter does not exists") unless @adapters.has_key? repo_id
-        @selected_adapter = repo_id
       end
 
       def [](model, repo_id=nil)
-        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{repo_id || @selected_adapter}'") unless @pool.has_key? self.class.key(model, repo_id || @selected_adapter)
-        @pool[self.class.key(model.to_sym, repo_id || @selected_adapter)]
+        selected_repo = repo_id || @adapters.default
+        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{selected_repo}'") unless @pool.has_key? self.class.key(model, selected_repo)
+        @pool[self.class.key(model.to_sym, selected_repo)]
       end
 
       def load!
