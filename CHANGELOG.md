@@ -1,5 +1,8 @@
 Tzispa Data
 
+## v0.1.4
+- add connection validation config in adapters
+
 ## v0.1.3
 - remove use method
 
