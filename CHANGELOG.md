@@ -1,5 +1,8 @@
 Tzispa Data
 
+## v0.2.0
+- add data transporter class for import/export data
+
 ## v0.1.4
 - add connection validation config in adapters
 
