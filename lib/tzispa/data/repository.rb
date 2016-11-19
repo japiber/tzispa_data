@@ -14,6 +14,8 @@ module Tzispa
 
     class Repository
 
+      using Tzispa::Utils
+
       attr_reader :root, :adapters
 
       LOCAL_REPO_ROOT = :repository
@@ -39,8 +41,8 @@ module Tzispa
               build_local_repo id, cfg
             else
               require cfg.gem
-              repo_mod, build_method = cfg.register.split('#')
-              (TzString.constantize repo_mod).send build_method, self, id, cfg
+              self.class.include "Repository::#{id.to_s.camelize}".constantize
+              self.class.send "load_#{id}", self, id, cfg
             end
           }
         }
@@ -61,7 +63,7 @@ module Tzispa
         Dir["./#{root.to_s.downcase}/#{repo_id}/*.rb"].each { |file|
           model_id = file.split('/').last.split('.').first
           require local_model_source(model_id, repo_id)
-          model_class = TzString.constantize "Repository::#{TzString.camelize repo_id}::#{TzString.camelize model_id}"
+          model_class = "Repository::#{repo_id.camelize}::#{model_id.camelize}".constantize
           register model_id, model_class, repo_id, config
         }
       end
