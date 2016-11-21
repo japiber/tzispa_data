@@ -1,5 +1,8 @@
 Tzispa Data
 
+## v0.2.1
+- code fixes for replacing TzString with String refinement
+
 ## v0.2.0
 - add data transporter class for import/export data
 
