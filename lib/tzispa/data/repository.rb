@@ -38,7 +38,8 @@ module Tzispa
           Mutex.new.synchronize {
             Sequel::Model.db = @adapters[id]
             if cfg.local
-              build_local_repo id, cfg
+              load_local_helpers id, cfg
+              load_local_models id, cfg
             else
               require cfg.gem
               self.class.include "Repository::#{id.to_s.camelize}".constantize
@@ -59,17 +60,22 @@ module Tzispa
 
       private
 
-      def build_local_repo(repo_id, config)
-        Dir["./#{root.to_s.downcase}/#{repo_id}/*.rb"].each { |file|
+      def load_local_models(repo_id, config)
+        models_path = "#{root}/#{repo_id}/model"
+        Dir[File.expand_path("#{models_path}/*.rb")].each { |file|
           model_id = file.split('/').last.split('.').first
-          require local_model_source(model_id, repo_id)
-          model_class = "Repository::#{repo_id.camelize}::#{model_id.camelize}".constantize
+          require_relative "#{models_path}/#{model_id}"
+          model_class = "Repository::#{repo_id.to_s.camelize}::Model::#{model_id.camelize}".constantize
           register model_id, model_class, repo_id, config
         }
       end
 
-      def local_model_source(model, repo_id)
-        "./#{root.to_s.downcase}/#{repo_id}/#{model}"
+      def load_local_helpers(repo_id, config)
+        helpers_path = "#{root}/#{repo_id}/helpers"
+        Dir[File.expand_path("#{helpers_path}/*.rb")].each { |file|
+          helper_id = file.split('/').last.split('.').first
+          require_relative "#{helpers_path}/#{helper_id}"
+        }
       end
 
       def self.key(model_id, repo_id)
