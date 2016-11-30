@@ -61,20 +61,20 @@ module Tzispa
       private
 
       def load_local_models(repo_id, config)
-        models_path = "#{root}/#{repo_id}/model"
-        Dir[File.expand_path("#{models_path}/*.rb")].each { |file|
+        models_path = "./#{root}/#{repo_id}/model"
+        Dir["#{models_path}/*.rb"].each { |file|
           model_id = file.split('/').last.split('.').first
-          require_relative "#{models_path}/#{model_id}"
+          require "#{models_path}/#{model_id}"
           model_class = "Repository::#{repo_id.to_s.camelize}::Model::#{model_id.camelize}".constantize
           register model_id, model_class, repo_id, config
         }
       end
 
       def load_local_helpers(repo_id, config)
-        helpers_path = "#{root}/#{repo_id}/helpers"
-        Dir[File.expand_path("#{helpers_path}/*.rb")].each { |file|
+        helpers_path = "./#{root}/#{repo_id}/helpers"
+        Dir["#{helpers_path}/*.rb"].each { |file|
           helper_id = file.split('/').last.split('.').first
-          require_relative "#{helpers_path}/#{helper_id}"
+          require "#{helpers_path}/#{helper_id}"
         }
       end
 
