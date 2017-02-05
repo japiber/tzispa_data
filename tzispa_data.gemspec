@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version     =    '~> 2.3'
 
   s.add_dependency 'sequel',       '~> 4.31'
-  s.add_dependency 'tzispa_utils', '~> 0.1'
+  s.add_dependency 'tzispa_utils', '~> 0.2'
 
   s.files         = Dir.glob("{lib}/**/*") + %w(README.md CHANGELOG.md)
   s.require_paths = ['lib']
