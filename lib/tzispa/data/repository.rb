@@ -29,22 +29,34 @@ module Tzispa
 
       def [](model, repo_id=nil)
         selected_repo = repo_id || @adapters.default
-        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{selected_repo}'") unless @pool.has_key? self.class.key(model, selected_repo)
-        @pool[self.class.key(model.to_sym, selected_repo)]
+        raise UnknownModel.new("The '#{model}' model does not exists in the adapter '#{selected_repo}'") unless @pool.has_key?(selected_repo) && @pool[selected_repo].has_key?(model.to_sym)
+        @pool[selected_repo][model.to_sym]
       end
 
-      def load!
+      def models(repo_id=nil)
+        @pool[repo_id || @adapters.default].values
+      end
+
+      def module_const(repo_id=nil)
+        selected_repo = repo_id || @adapters.default
+        @pool[selected_repo][:'__repository_module'] ||= repository_module(selected_repo)
+      end
+
+      def load!(domain)
         @config.each { |id, cfg|
           Mutex.new.synchronize {
+            @pool[id] = Hash.new
             Sequel::Model.db = @adapters[id]
             if cfg.local
               load_local_helpers id, cfg
               load_local_models id, cfg
             else
               require cfg.gem
-              self.class.include "Repository::#{id.to_s.camelize}".constantize
+              repo_module = "#{id.to_s.camelize}".constantize
+              self.class.include repo_module
               self.class.send "load_#{id}", self, id, cfg
             end
+            domain.include module_const(id)
           }
         }
         self
@@ -55,17 +67,24 @@ module Tzispa
         config.extensions.split(',').each { |ext|
           model_class.db.extension ext.to_sym
         } if config.respond_to? :extensions
-        @pool[self.class.key(model_id, repo_id)] = model_class
+        @pool[repo_id][model_id.to_sym] = model_class
       end
 
       private
 
+      def repository_module(repo_id)
+        rm = @pool[repo_id].first[1].name.split('::')
+        rm.pop
+        rm.join('::').constantize
+      end
+
       def load_local_models(repo_id, config)
         models_path = "./#{root}/#{repo_id}/model"
+        repo_module = "#{repo_id.to_s.camelize}::Model".constantize
         Dir["#{models_path}/*.rb"].each { |file|
           model_id = file.split('/').last.split('.').first
           require "#{models_path}/#{model_id}"
-          model_class = "Repository::#{repo_id.to_s.camelize}::Model::#{model_id.camelize}".constantize
+          model_class = "#{repo_module}::#{model_id.camelize}".constantize
           register model_id, model_class, repo_id, config
         }
       end
@@ -76,10 +95,6 @@ module Tzispa
           helper_id = file.split('/').last.split('.').first
           require "#{helpers_path}/#{helper_id}"
         }
-      end
-
-      def self.key(model_id, repo_id)
-        "#{model_id}@#{repo_id}".to_sym
       end
 
     end
