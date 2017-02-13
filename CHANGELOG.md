@@ -1,5 +1,10 @@
 Tzispa Data
 
+## v0.3.0
+- local repository helpers preloading
+- fix local repository loader
+- repositories module namespace get & simplifification
+
 ## v0.2.1
 - code fixes for replacing TzString with String refinement
 
