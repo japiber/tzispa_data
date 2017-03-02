@@ -14,9 +14,9 @@ module Tzispa
       attr_reader :default
 
       def initialize(config, default = nil)
-        @default = default || config.first[0].to_sym
-        @pool = {}.tap do |hash|
-          config.each { |k, v| hash[k.to_sym] = Sequel.connect v.adapter }
+        @default = default || config.first[0]
+        @pool = {}.tap do |hsh|
+          config.each { |k, v| hsh[k.to_sym] = Sequel.connect "#{v.adapter}://#{v.database}" }
         end
         Sequel.default_timezone = :utc
         Sequel.datetime_class = DateTime
