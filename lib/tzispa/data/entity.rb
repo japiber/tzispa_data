@@ -18,10 +18,11 @@ module Tzispa
         using Tzispa::Utils
 
         def entity_class
-          if class_variable_defined?(:@@__entity_class)
-            class_variable_get(:@@__entity_class)
+          if class_variable_defined? :@@__entity_class
+            class_variable_get :@@__entity_class
           else
-            class_variable_set(:@@__entity_class, "#{self}Entity".constantize)
+            class_variable_set :@@__entity_class,
+                               name.sub('::Model', '::Entity').constantize
           end
         end
         alias entity entity_class

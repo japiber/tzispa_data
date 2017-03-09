@@ -24,9 +24,9 @@ module Tzispa
 
       LOCAL_REPO_ROOT = :repository
 
-      def initialize(config, root = LOCAL_REPO_ROOT)
+      def initialize(config, root = nil)
         @config = config
-        @root = root
+        @root = root || LOCAL_REPO_ROOT
         @pool = {}
         @adapters = AdapterPool.new config
       end
@@ -83,6 +83,7 @@ module Tzispa
         if cfg.local
           load_local_helpers id
           load_local_models id, cfg
+          load_local_entities id, cfg
         else
           require cfg.gem
           repo_module = id.to_s.camelize.constantize
@@ -99,6 +100,14 @@ module Tzispa
           require "#{models_path}/#{model_id}"
           model_class = "#{repo_module}::#{model_id.camelize}".constantize
           register model_id, model_class, repo_id, config
+        end
+      end
+
+      def load_local_entities(repo_id, config)
+        entities_path = "./#{root}/#{repo_id}/entity"
+        Dir["#{entities_path}/*.rb"].each do |file|
+          entity_id = file.split('/').last.split('.').first
+          require "#{entities_path}/#{entity_id}"
         end
       end
 
