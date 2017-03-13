@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require File.expand_path('../lib/tzispa/data/version', __FILE__)
 
 Gem::Specification.new do |s|
@@ -12,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = 'Data access layer for Tzispa'
   s.licenses    = ['MIT']
 
-  s.required_ruby_version     =    '~> 2.3'
+  s.required_ruby_version = '~> 2.3'
 
   s.add_dependency 'sequel',       '~> 4.31'
   s.add_dependency 'tzispa_utils', '~> 0.3'

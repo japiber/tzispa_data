@@ -1,5 +1,9 @@
 Tzispa Data
 
+## v0.4.0
+- new repository configuration schema
+- code separation between models and entities into independent namespaces
+
 ## v0.3.0
 - local repository helpers preloading
 - fix local repository loader
