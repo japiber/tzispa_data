@@ -18,7 +18,7 @@ module Tzispa
     class UnknownModel < DataError; end
 
     class Repository
-      using Tzispa::Utils
+      using Tzispa::Utils::TzString
 
       attr_reader :root, :adapters
 
@@ -83,7 +83,7 @@ module Tzispa
         if cfg.local
           load_local_helpers id
           load_local_models id, cfg
-          load_local_entities id, cfg
+          load_local_entities id
         else
           require cfg.gem
           repo_module = id.to_s.camelize.constantize
@@ -103,7 +103,7 @@ module Tzispa
         end
       end
 
-      def load_local_entities(repo_id, config)
+      def load_local_entities(repo_id)
         entities_path = "./#{root}/#{repo_id}/entity"
         Dir["#{entities_path}/*.rb"].each do |file|
           entity_id = file.split('/').last.split('.').first

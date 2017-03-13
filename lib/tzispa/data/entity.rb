@@ -15,7 +15,7 @@ module Tzispa
       end
 
       module ClassMethods
-        using Tzispa::Utils
+        using Tzispa::Utils::TzString
 
         def entity_class
           if class_variable_defined? :@@__entity_class
