@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'sequel'
+require 'redis'
 require 'tzispa/utils/string'
 require 'tzispa/data/adapter_pool'
 
@@ -23,6 +24,14 @@ module Tzispa
       attr_reader :root, :adapters
 
       LOCAL_REPO_ROOT = :repository
+
+      DEFAULT_CACHE_TTL = 900
+
+      class << self
+        def cache_client
+          @cache_client ||= Redis.new(host: 'localhost')
+        end
+      end
 
       def initialize(config, root = nil)
         @config = config
@@ -65,6 +74,10 @@ module Tzispa
           config.extensions.split(',').each do |ext|
             model_class.db.extension ext.to_sym
           end
+        end
+        if config.caching
+          model_class.plugin :caching, self.class.cache_client,
+                             ttl: config.ttl || DEFAULT_CACHE_TTL
         end
         @pool[repo_id][model_id.to_sym] = model_class
       end
