@@ -11,25 +11,34 @@ module Tzispa
       extend Forwardable
 
       def_delegators :@pool, :has_key?, :keys
-      attr_reader :default
+      attr_reader :default_repo
 
       def initialize(config, default = nil)
         setup_sequel
-        @default = default || config.first[0]
+        @default_repo = default || config.first[0]
         @pool = {}.tap do |hsh|
-          config.each do |k, v|
-            conn = Sequel.connect "#{v.adapter}://#{v.database}"
-            if v.connection_validation
-              conn.extension(:connection_validator)
-              conn.pool.connection_validation_timeout = v.validation_timeout || DEFAULT_TIMEOUT
-            end
-            hsh[k.to_sym] = conn
+          config.each { |kid, vc| hsh[kid.to_sym] = connect(vc) }
+        end
+      end
+
+      def connect(config)
+        Sequel.connect("#{config.adapter}://#{config.database}").tap do |conn|
+          if config.connection_validation
+            conn.extension(:connection_validator)
+            conn.pool.connection_validation_timeout = config.validation_timeout || DEFAULT_TIMEOUT
+          end
+          if config.respond_to? :extensions
+            config.extensions.split(',').each { |ext| conn.extension ext.to_sym }
           end
         end
       end
 
       def [](name = nil)
-        @pool[name&.to_sym || default]
+        @pool[name&.to_sym || default_repo]
+      end
+
+      def default
+        @pool[default_repo]
       end
 
       def setup_sequel
