@@ -41,18 +41,18 @@ module Tzispa
       end
 
       def [](model, repo_id = nil)
-        selected_repo = repo_id || adapters.default
+        selected_repo = repo_id || adapters.default_repo
         raise UnknownModel.new(model, selected_repo) unless pool.key?(selected_repo) &&
                                                             pool[selected_repo].key?(model.to_sym)
         pool[selected_repo][model.to_sym]
       end
 
       def models(repo_id = nil)
-        pool[repo_id || adapters.default].values
+        pool[repo_id || adapters.default_repo].values
       end
 
       def module_const(repo_id = nil)
-        selected_repo = repo_id || adapters.default
+        selected_repo = repo_id || adapters.default_repo
         pool[selected_repo][:__repository_module] ||= repository_module(selected_repo)
       end
 
@@ -70,11 +70,6 @@ module Tzispa
 
       def register(model_id, model_class, repo_id, config)
         model_class.db = @adapters[repo_id]
-        if config.respond_to? :extensions
-          config.extensions.split(',').each do |ext|
-            model_class.db.extension ext.to_sym
-          end
-        end
         if config.caching
           model_class.plugin :caching, self.class.cache_client,
                              ttl: config.ttl || DEFAULT_CACHE_TTL
