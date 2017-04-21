@@ -1,5 +1,10 @@
 Tzispa Data
 
+## 0.4.1
+- use redis for model cache
+- adapter pool optimizations and bugs fixes
+- setup sequel extensions individualy for adapter_pool connections
+
 ## v0.4.0
 - new repository configuration schema
 - code separation between models and entities into independent namespaces
