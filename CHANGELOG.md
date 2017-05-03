@@ -1,5 +1,10 @@
 Tzispa Data
 
+## v0.4.2
+- new cache system use Dalli for model Sequel caching
+- independent caching per repository
+- bugs fix
+
 ## 0.4.1
 - use redis for model cache
 - adapter pool optimizations and bugs fixes
