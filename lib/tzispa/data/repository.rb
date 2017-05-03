@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'sequel'
-require 'redis'
 require 'tzispa/utils/string'
 require 'tzispa/data/adapter_pool'
 
@@ -22,16 +21,6 @@ module Tzispa
       using Tzispa::Utils::TzString
 
       attr_reader :root, :adapters
-
-      LOCAL_REPO_ROOT = :repository
-
-      DEFAULT_CACHE_TTL = 900
-
-      class << self
-        def cache_client
-          @cache_client ||= Redis.new(host: 'localhost')
-        end
-      end
 
       def initialize(config, root = nil)
         @config = config
@@ -60,7 +49,6 @@ module Tzispa
         @config.each do |id, cfg|
           Mutex.new.synchronize do
             pool[id] = {}
-            Sequel::Model.db = adapters[id]
             load_config_repo(id, cfg)
             domain.include module_const(id)
           end
@@ -69,12 +57,18 @@ module Tzispa
       end
 
       def register(model_id, model_class, repo_id, config)
-        model_class.db = @adapters[repo_id]
-        if config.caching
-          model_class.plugin :caching, self.class.cache_client,
-                             ttl: config.ttl || DEFAULT_CACHE_TTL
+        unless pool[repo_id][model_id.to_sym]
+          unless model_class.db == adapters[repo_id]
+            model_class.db = adapters[repo_id]
+            if config.caching
+              model_class.plugin :caching, adapters.cache[repo_id],
+                                 ttl: config.ttl || DEFAULT_CACHE_TTL,
+                                 ignore_exceptions: true
+            end
+          end
+          pool[repo_id][model_id.to_sym] = model_class
         end
-        @pool[repo_id][model_id.to_sym] = model_class
+        pool[repo_id][model_id.to_sym]
       end
 
       private
@@ -126,6 +120,10 @@ module Tzispa
           require "#{helpers_path}/#{helper_id}"
         end
       end
+
+      LOCAL_REPO_ROOT = :repository
+
+      DEFAULT_CACHE_TTL = 900
     end
 
   end
