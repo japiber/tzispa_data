@@ -14,11 +14,11 @@ Gem::Specification.new do |s|
   s.description = 'Data access layer for Tzispa'
   s.licenses    = ['MIT']
 
-  s.required_ruby_version = '~> 2.3'
+  s.required_ruby_version = '~> 2.4'
 
   s.add_dependency 'sequel',       '~> 4.44'
   s.add_dependency 'dalli',        '~> 2.7'
-  s.add_dependency 'tzispa_utils', '~> 0.3'
+  s.add_dependency 'tzispa_utils', '~> 0.3.5'
 
   s.files         = Dir.glob("{lib}/**/*") + %w(README.md CHANGELOG.md)
   s.require_paths = ['lib']

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'sequel'
-require 'tzispa/utils/string'
+require 'tzispa_utils'
 require 'tzispa/data/adapter_pool'
 
 module Tzispa
