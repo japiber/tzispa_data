@@ -27,10 +27,10 @@ module Tzispa
         File.exist? filename
       end
 
-      def import(dataset, columns)
+      def import(dataset, columns, &block)
         errors.clear
         File.open(filename, "rb:#{encoding}") do |fh|
-          lines = process_file_import fh, dataset, columns
+          lines = process_file_import fh, dataset, columns, &block
           ds_count = dataset.count
           raise TransporterRecordCount.new(lines, ds_count) if check_count && lines != ds_count
           [lines, ds_count]
@@ -58,10 +58,11 @@ module Tzispa
       private
 
       def process_file_import(fh, dataset, columns)
+        lines = 0
         while (line = read_line(fh, lines))
-          lines = (lines || 0) + 1
+          lines += 1
           values = block_given? ? yield(line) : line.split(data_separator)
-          columns? lines, values.count
+          columns? lines, values.count, columns.count
           (buffer ||= []) << values
           flush_data(dataset, columns, buffer)
         end
@@ -118,8 +119,8 @@ module Tzispa
         raise TransporterBadFormat.new(line) unless res.nil? || res.strip.empty?
       end
 
-      def columns?(line, cols)
-        raise TransporterBadFormat.new(line) unless cols == columns.count
+      def columns?(line, cols, expected)
+        raise TransporterBadFormat.new(line) unless cols == expected
       end
     end
 
