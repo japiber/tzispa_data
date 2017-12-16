@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '~> 2.4'
 
-  s.add_dependency 'sequel',       '~> 4.44'
+  s.add_dependency 'sequel',       '~> 5.2'
   s.add_dependency 'dalli',        '~> 2.7'
   s.add_dependency 'tzispa_utils', '~> 0.3.5'
 
