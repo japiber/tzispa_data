@@ -1,5 +1,9 @@
 Tzispa Data
 
+## v0.6.0
+- repository configuration moved from tzispa gem
+- Repository is now a singletonn
+
 ## v0.4.4
 - fix missing block param at Transporter import method
 
