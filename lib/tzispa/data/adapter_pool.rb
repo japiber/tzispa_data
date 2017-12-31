@@ -34,6 +34,10 @@ module Tzispa
         end
       end
 
+      def disconnect
+        @pool.each_value(&:disconnect)
+      end
+
       def connect(config)
         Sequel.connect("#{config.adapter}://#{config.database}").tap do |conn|
           if config.connection_validation
