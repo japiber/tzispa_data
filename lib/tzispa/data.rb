@@ -3,11 +3,11 @@
 module Tzispa
   module Data
 
-    require 'tzispa/data/adapter_pool'
-    require 'tzispa/data/repository'
-    require 'tzispa/data/transporter'
-    require 'tzispa/data/entity'
-    require 'tzispa/data/version'
+    autoload :Config,         'tzispa/data/config'
+    autoload :AdapterPool,    'tzispa/data/adapter_pool'
+    autoload :Repository,     'tzispa/data/repository'
+    autoload :TRansporter,    'tzispa/data/transporter'
+    autoload :Entity,         'tzispa/data/entity'
 
   end
 end
